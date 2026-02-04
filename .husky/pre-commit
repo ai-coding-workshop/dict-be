@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+set -e
+
+gofmt -w $(go list -f '{{.Dir}}' ./...)
+go vet ./...
+go test ./...
