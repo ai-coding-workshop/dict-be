@@ -1,0 +1,11 @@
+{
+  "name": "dict-be",
+  "private": true,
+  "scripts": {
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@ai-coding-workshop/commit-msg": "^0.2.10",
+    "husky": "^9.0.11"
+  }
+}

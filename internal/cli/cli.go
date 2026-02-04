@@ -28,7 +28,8 @@ func Execute(args []string, out io.Writer, errOut io.Writer) int {
 		errOut = io.Discard
 	}
 
-	commands := []Command{
+	var commands []Command
+	commands = []Command{
 		{
 			Name:        "help",
 			Description: "Show available commands",
