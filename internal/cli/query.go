@@ -28,6 +28,8 @@ type queryOptions struct {
 	InputFile      string
 	InputLanguage  string
 	OutputLanguage string
+	Stream         bool
+	NoStream       bool
 }
 
 func newQueryCmd() *cobra.Command {
@@ -44,10 +46,15 @@ func newQueryCmd() *cobra.Command {
 	cmd.Flags().StringVar(&opts.InputLanguage, "in", "auto", "input language")
 	cmd.Flags().StringVar(&opts.OutputLanguage, "output-language", "auto", "output language")
 	cmd.Flags().StringVar(&opts.OutputLanguage, "out", "auto", "output language")
+	cmd.Flags().BoolVar(&opts.Stream, "stream", false, "stream response")
+	cmd.Flags().BoolVar(&opts.NoStream, "no-stream", false, "disable streaming response")
 	return cmd
 }
 
 func runQuery(cmd *cobra.Command, opts *queryOptions, args []string) error {
+	if opts.Stream && opts.NoStream {
+		return fmt.Errorf("only one of --stream or --no-stream can be set")
+	}
 	input, err := readInput(args, opts.InputFile, cmd.InOrStdin())
 	if err != nil {
 		return err
@@ -78,6 +85,19 @@ func runQuery(cmd *cobra.Command, opts *queryOptions, args []string) error {
 		Model:    cfg.LLM.Model,
 		Messages: buildMessages(systemPrompt, userPrompt),
 	}
+
+	if opts.Stream {
+		_, err = client.ChatStream(context.Background(), req, func(delta string) error {
+			_, writeErr := fmt.Fprint(cmd.OutOrStdout(), delta)
+			return writeErr
+		})
+		if err != nil {
+			return err
+		}
+		_, _ = fmt.Fprintln(cmd.OutOrStdout())
+		return nil
+	}
+
 	resp, err := client.Chat(context.Background(), req)
 	if err != nil {
 		return err
