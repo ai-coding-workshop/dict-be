@@ -67,9 +67,6 @@ func runLLMChat(cmd *cobra.Command, opts *llmChatOptions) error {
 	if cfg.LLM.Type == "" {
 		cfg.LLM.Type = "openai"
 	}
-	if cfg.LLM.Type != "openai" {
-		return fmt.Errorf("unsupported llm.type: %s", cfg.LLM.Type)
-	}
 
 	prompt := strings.TrimSpace(opts.Prompt)
 	if prompt == "" {
@@ -87,11 +84,7 @@ func runLLMChat(cmd *cobra.Command, opts *llmChatOptions) error {
 	url := firstNonEmpty(opts.URL, cfg.LLM.URL)
 	token := firstNonEmpty(opts.Token, cfg.LLM.Token)
 
-	client, err := llm.NewOpenAIClient(llm.OpenAIConfig{
-		BaseURL: url,
-		Token:   token,
-		Model:   model,
-	})
+	client, err := newLLMClient(cfg.LLM.Type, url, token, model)
 	if err != nil {
 		return err
 	}
@@ -159,19 +152,12 @@ func runLLMTest(cmd *cobra.Command, opts *llmTestOptions) error {
 	if cfg.LLM.Type == "" {
 		cfg.LLM.Type = "openai"
 	}
-	if cfg.LLM.Type != "openai" {
-		return fmt.Errorf("unsupported llm.type: %s", cfg.LLM.Type)
-	}
 
 	model := firstNonEmpty(opts.Model, cfg.LLM.Model)
 	url := firstNonEmpty(opts.URL, cfg.LLM.URL)
 	token := firstNonEmpty(opts.Token, cfg.LLM.Token)
 
-	client, err := llm.NewOpenAIClient(llm.OpenAIConfig{
-		BaseURL: url,
-		Token:   token,
-		Model:   model,
-	})
+	client, err := newLLMClient(cfg.LLM.Type, url, token, model)
 	if err != nil {
 		return err
 	}
@@ -228,4 +214,23 @@ func firstNonEmpty(values ...string) string {
 		}
 	}
 	return ""
+}
+
+func newLLMClient(provider, url, token, model string) (llm.Client, error) {
+	switch provider {
+	case "openai":
+		return llm.NewOpenAIClient(llm.OpenAIConfig{
+			BaseURL: url,
+			Token:   token,
+			Model:   model,
+		})
+	case "anthropics":
+		return llm.NewAnthropicClient(llm.AnthropicConfig{
+			BaseURL: url,
+			Token:   token,
+			Model:   model,
+		})
+	default:
+		return nil, fmt.Errorf("unsupported llm.type: %s", provider)
+	}
 }
