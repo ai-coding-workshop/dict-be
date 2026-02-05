@@ -39,6 +39,7 @@ func NewRootCmd() *cobra.Command {
 	)
 	_ = viper.BindPFlag("config", root.PersistentFlags().Lookup("config"))
 
+	root.AddCommand(newQueryCmd())
 	root.AddCommand(newVersionCmd())
 	return root
 }
