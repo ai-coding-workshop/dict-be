@@ -41,6 +41,7 @@ func NewRootCmd() *cobra.Command {
 
 	root.AddCommand(newQueryCmd())
 	root.AddCommand(newVersionCmd())
+	root.AddCommand(newLLMCmd())
 	return root
 }
 
