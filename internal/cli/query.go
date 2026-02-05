@@ -11,6 +11,8 @@ import (
 
 func newQueryCmd() *cobra.Command {
 	var inputFile string
+	var inputLanguage string
+	var outputLanguage string
 	cmd := &cobra.Command{
 		Use:   "query [text...]",
 		Short: "Read query from args, file, or stdin",
@@ -24,6 +26,8 @@ func newQueryCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&inputFile, "file", "F", "", "query file, use -F- for stdin")
+	cmd.Flags().StringVar(&inputLanguage, "input-language", "auto", "input language")
+	cmd.Flags().StringVar(&outputLanguage, "output-language", "auto", "output language")
 	return cmd
 }
 
