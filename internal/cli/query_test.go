@@ -55,3 +55,33 @@ func TestReadQueryConflict(t *testing.T) {
 		t.Fatalf("expected error")
 	}
 }
+
+func TestResolveLanguagesAutoChinese(t *testing.T) {
+	inputLang, outputLang := resolveLanguages("你好，世界", "auto", "auto")
+	if inputLang != "Simplified Chinese" {
+		t.Fatalf("unexpected input language: %q", inputLang)
+	}
+	if outputLang != "English" {
+		t.Fatalf("unexpected output language: %q", outputLang)
+	}
+}
+
+func TestResolveLanguagesAutoEnglish(t *testing.T) {
+	inputLang, outputLang := resolveLanguages("hello world", "auto", "auto")
+	if inputLang != "English" {
+		t.Fatalf("unexpected input language: %q", inputLang)
+	}
+	if outputLang != "Simplified Chinese" {
+		t.Fatalf("unexpected output language: %q", outputLang)
+	}
+}
+
+func TestResolveLanguagesNoAuto(t *testing.T) {
+	inputLang, outputLang := resolveLanguages("你好", "Chinese", "German")
+	if inputLang != "Chinese" {
+		t.Fatalf("unexpected input language: %q", inputLang)
+	}
+	if outputLang != "German" {
+		t.Fatalf("unexpected output language: %q", outputLang)
+	}
+}

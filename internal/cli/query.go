@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"unicode"
 
 	"github.com/spf13/cobra"
 )
@@ -21,6 +22,7 @@ func newQueryCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			inputLanguage, outputLanguage = resolveLanguages(input, inputLanguage, outputLanguage)
 			fmt.Fprintln(cmd.OutOrStdout(), input)
 			return nil
 		},
@@ -57,4 +59,23 @@ func readInput(args []string, inputFile string, stdin io.Reader) (string, error)
 
 func trimTrailingNewline(value string) string {
 	return strings.TrimRight(value, "\r\n")
+}
+
+func resolveLanguages(input, inputLanguage, outputLanguage string) (string, string) {
+	if inputLanguage == "auto" && outputLanguage == "auto" {
+		if containsChinese(input) {
+			return "Simplified Chinese", "English"
+		}
+		return "English", "Simplified Chinese"
+	}
+	return inputLanguage, outputLanguage
+}
+
+func containsChinese(value string) bool {
+	for _, r := range value {
+		if unicode.Is(unicode.Han, r) {
+			return true
+		}
+	}
+	return false
 }
