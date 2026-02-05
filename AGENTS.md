@@ -6,7 +6,10 @@
 
 - `cmd/dict-be/`：CLI 入口，`main.go` 负责解析入口参数并调用内部 CLI。
 - `internal/cli/`：命令调度层，集中定义子命令、参数与输出。
+- `internal/config/`：配置加载与校验，使用 Viper 读取文件/环境变量。
+- `internal/llm/`：LLM 客户端适配层（OpenAI/Anthropic/Gemini）。
 - `internal/version/`：版本信息，默认 `dev`，支持通过 `-ldflags` 注入。
+- `static/`：前端静态资源（GitHub Pages）。
 - `go.mod`：模块定义。
 
 约定：
@@ -19,6 +22,9 @@
 - 模块边界清晰，避免跨层直接调用。
 - 任何新功能需要有明确的命令或接口入口。
 - 重要行为需要可测试（优先添加单元测试）。
+- CLI 配置统一走 `internal/config`，不要在命令中直接读取环境变量。
+- LLM 相关逻辑集中在 `internal/llm`，避免在命令层直接拼接请求。
+- 提示词模板存放在 `internal/cli/*.md`，通过 `embed` 嵌入读取。
 
 ## 代码风格与格式
 
