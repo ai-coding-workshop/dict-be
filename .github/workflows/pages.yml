@@ -28,20 +28,88 @@ jobs:
           go-version-file: go.mod
           cache: true
 
-      - name: Build binary
-        run: go build -o dict-be ./cmd/dict-be
+      - name: Build binaries
+        run: make release
 
       - name: Prepare Pages artifact
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p dict
-          cp dict-be dict/dict-be
-          cat > dict/README.md <<'EOF'
-          # dict-be
-
-          Download: [dict-be](./dict-be)
+          cp -R dist/linux-amd64 dist/macos-arm64 dist/windows-amd64 dict/
+          mkdir -p static
+          cat > static/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>dict-be Downloads</title>
+              <link rel="stylesheet" href="./style.css" />
+            </head>
+            <body>
+              <main class="container">
+                <h1>dict-be</h1>
+                <p>Download prebuilt binaries:</p>
+                <ul class="downloads">
+                  <li>
+                    <a href="./linux-amd64/dict-be">linux-amd64/dict-be</a>
+                  </li>
+                  <li>
+                    <a href="./macos-arm64/dict-be">macos-arm64/dict-be</a>
+                  </li>
+                  <li>
+                    <a href="./windows-amd64/dict-be.exe">windows-amd64/dict-be.exe</a>
+                  </li>
+                </ul>
+              </main>
+            </body>
+          </html>
           EOF
+          cat > static/style.css <<'EOF'
+          :root {
+            color-scheme: light dark;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+          }
+
+          body {
+            margin: 0;
+            background: #0f172a;
+            color: #e2e8f0;
+          }
+
+          .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 64px 24px;
+          }
+
+          h1 {
+            margin: 0 0 12px;
+            font-size: 36px;
+          }
+
+          .downloads {
+            list-style: none;
+            padding: 0;
+            margin: 24px 0 0;
+          }
+
+          .downloads li {
+            margin: 12px 0;
+          }
+
+          .downloads a {
+            color: #38bdf8;
+            text-decoration: none;
+            font-weight: 600;
+          }
+
+          .downloads a:hover {
+            text-decoration: underline;
+          }
+          EOF
+          cp -R static/* dict/
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

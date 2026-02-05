@@ -1,4 +1,4 @@
-.PHONY: build run fmt vet test tidy clean
+.PHONY: build run fmt vet test tidy clean release
 
 BINARY_NAME := dict-be
 CMD_PATH := ./cmd/$(BINARY_NAME)
@@ -23,3 +23,9 @@ tidy:
 
 clean:
 	rm -f $(BINARY_NAME)
+
+release:
+	mkdir -p dist/linux-amd64 dist/macos-arm64 dist/windows-amd64
+	GOOS=linux GOARCH=amd64 go build -o dist/linux-amd64/$(BINARY_NAME) $(CMD_PATH)
+	GOOS=darwin GOARCH=arm64 go build -o dist/macos-arm64/$(BINARY_NAME) $(CMD_PATH)
+	GOOS=windows GOARCH=amd64 go build -o dist/windows-amd64/$(BINARY_NAME).exe $(CMD_PATH)
