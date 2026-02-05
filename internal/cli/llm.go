@@ -230,6 +230,12 @@ func newLLMClient(provider, url, token, model string) (llm.Client, error) {
 			Token:   token,
 			Model:   model,
 		})
+	case "gemini":
+		return llm.NewGeminiClient(llm.GeminiConfig{
+			BaseURL: url,
+			Token:   token,
+			Model:   model,
+		})
 	default:
 		return nil, fmt.Errorf("unsupported llm.type: %s", provider)
 	}
