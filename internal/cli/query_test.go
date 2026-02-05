@@ -85,3 +85,16 @@ func TestResolveLanguagesNoAuto(t *testing.T) {
 		t.Fatalf("unexpected output language: %q", outputLang)
 	}
 }
+
+func TestBuildQueryPrompts(t *testing.T) {
+	systemPrompt, userPrompt, err := buildQueryPrompts("hello", "English", "Simplified Chinese")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !strings.Contains(systemPrompt, "English") || !strings.Contains(systemPrompt, "Simplified Chinese") {
+		t.Fatalf("unexpected system prompt: %q", systemPrompt)
+	}
+	if !strings.Contains(userPrompt, "<input>hello</input>") {
+		t.Fatalf("unexpected user prompt: %q", userPrompt)
+	}
+}
